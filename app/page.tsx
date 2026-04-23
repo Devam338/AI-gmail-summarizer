@@ -12,7 +12,7 @@ interface Contact {
   messageCount: number;
   lastContact: string;
   snippet: string;
-}
+} 
 
 interface SentimentResult {
   sentiment: "positive" | "negative" | "neutral" | "mixed";
