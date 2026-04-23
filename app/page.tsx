@@ -97,7 +97,7 @@ export default function Home() {
           contactEmail: contact.email,
           contactName: contact.name,
         }),
-      });
+      }); 
 
       const data = await res.json();
 
