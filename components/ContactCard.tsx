@@ -22,7 +22,7 @@ interface SentimentResult {
 
 interface Props {
   contact: Contact;
-  sentiment: SentimentResult | "loading" | "error" | undefined;
+  sentiment: SentimentResult | "loading" | undefined;
   onAnalyze: () => void;
 }
 
@@ -119,7 +119,6 @@ function getAvatarColor(email: string) {
 
 export function ContactCard({ contact, sentiment, onAnalyze }: Props) {
   const isLoading = sentiment === "loading";
-  const isError = sentiment === "error";
   const result = typeof sentiment === "object" && sentiment !== null ? sentiment : null;
   const [fg, bg] = getAvatarColor(contact.email);
   const borderColor = result ? sentimentColors[result.sentiment] : "var(--border)";
@@ -145,7 +144,6 @@ export function ContactCard({ contact, sentiment, onAnalyze }: Props) {
         (e.currentTarget as HTMLDivElement).style.boxShadow = "none";
       }}
     >
-      {/* Header */}
       <div style={{ display: "flex", alignItems: "flex-start", gap: "0.875rem", marginBottom: "1rem" }}>
         <div
           style={{
@@ -178,7 +176,6 @@ export function ContactCard({ contact, sentiment, onAnalyze }: Props) {
         {result && <SentimentBadge sentiment={result.sentiment} />}
       </div>
 
-      {/* Meta */}
       <div
         style={{
           display: "flex",
@@ -193,20 +190,10 @@ export function ContactCard({ contact, sentiment, onAnalyze }: Props) {
         <span>🕐 {formatDate(contact.lastContact)}</span>
       </div>
 
-      {/* Result or button */}
       {isLoading && (
         <div style={{ display: "flex", alignItems: "center", gap: "0.5rem", color: "var(--text-dim)", fontSize: "0.85rem" }}>
           <LoadingSpinner size={16} />
           <span>Analyzing…</span>
-        </div>
-      )}
-
-      {isError && (
-        <div style={{ fontSize: "0.82rem", color: "var(--negative)" }}>
-          Analysis failed.{" "}
-          <button onClick={onAnalyze} style={{ background: "none", border: "none", color: "var(--accent)", cursor: "pointer", fontSize: "0.82rem", fontFamily: "inherit" }}>
-            Retry
-          </button>
         </div>
       )}
 
@@ -243,7 +230,7 @@ export function ContactCard({ contact, sentiment, onAnalyze }: Props) {
         </div>
       )}
 
-      {!isLoading && !isError && !result && (
+      {!isLoading && !result && (
         <button
           onClick={onAnalyze}
           style={{
