@@ -5,31 +5,68 @@ import { google } from "googleapis";
 
 function decodeBase64(data: string): string {
   try {
-    return Buffer.from(data.replace(/-/g, "+").replace(/_/g, "/"), "base64").toString("utf-8");
+    return Buffer.from(
+      data.replace(/-/g, "+").replace(/_/g, "/"),
+      "base64"
+    ).toString("utf-8");
   } catch {
     return "";
   }
 }
 
+function stripHtml(html: string): string {
+  return html
+    .replace(/<style[\s\S]*?<\/style>/gi, " ")
+    .replace(/<script[\s\S]*?<\/script>/gi, " ")
+    .replace(/<br\s*\/?>/gi, "\n")
+    .replace(/<\/p>/gi, "\n")
+    .replace(/<[^>]*>/g, " ")
+    .replace(/&nbsp;/g, " ")
+    .replace(/&amp;/g, "&")
+    .replace(/&lt;/g, "<")
+    .replace(/&gt;/g, ">")
+    .replace(/\s+/g, " ")
+    .trim();
+}
+
 function extractTextFromPayload(payload: any): string {
   if (!payload) return "";
 
+  let text = "";
+
   if (payload.mimeType === "text/plain" && payload.body?.data) {
-    return decodeBase64(payload.body.data);
+    text += decodeBase64(payload.body.data) + "\n";
   }
 
-  if (payload.parts) {
+  if (payload.mimeType === "text/html" && payload.body?.data) {
+    const html = decodeBase64(payload.body.data);
+    text += stripHtml(html) + "\n";
+  }
+
+  if (payload.parts && Array.isArray(payload.parts)) {
     for (const part of payload.parts) {
-      const text = extractTextFromPayload(part);
-      if (text) return text;
+      text += extractTextFromPayload(part) + "\n";
     }
   }
 
-  if (payload.body?.data) {
-    return decodeBase64(payload.body.data);
+  return text.replace(/\n{3,}/g, "\n\n").trim();
+}
+
+function safeJsonParse(text: string) {
+  const cleaned = text
+    .replace(/```json/gi, "")
+    .replace(/```/g, "")
+    .trim();
+
+  const jsonStart = cleaned.indexOf("{");
+  const jsonEnd = cleaned.lastIndexOf("}");
+
+  if (jsonStart === -1 || jsonEnd === -1 || jsonEnd < jsonStart) {
+    throw new Error("No valid JSON object found in model response");
   }
 
-  return "";
+  const jsonText = cleaned.slice(jsonStart, jsonEnd + 1);
+  return JSON.parse(jsonText);
 }
 
 export async function POST(req: NextRequest) {
@@ -41,7 +78,7 @@ export async function POST(req: NextRequest) {
 
   const { threadIds, contactEmail, contactName } = await req.json();
 
-  if (!threadIds || threadIds.length === 0) {
+  if (!threadIds || !Array.isArray(threadIds) || threadIds.length === 0) {
     return NextResponse.json({ error: "No thread IDs provided" }, { status: 400 });
   }
 
@@ -50,7 +87,6 @@ export async function POST(req: NextRequest) {
     auth.setCredentials({ access_token: session.accessToken });
     const gmail = google.gmail({ version: "v1", auth });
 
-    // Fetch thread content (limit to first 5 threads to stay within limits)
     const threadsToFetch = threadIds.slice(0, 5);
     let allEmailContent = "";
 
@@ -63,44 +99,74 @@ export async function POST(req: NextRequest) {
         });
 
         const messages = thread.data.messages || [];
-        for (const message of messages.slice(0, 4)) {
+
+        for (const message of messages.slice(0, 6)) {
           const headers = message.payload?.headers || [];
           const from = headers.find((h) => h.name === "From")?.value || "Unknown";
+          const to = headers.find((h) => h.name === "To")?.value || "Unknown";
           const date = headers.find((h) => h.name === "Date")?.value || "";
           const subject = headers.find((h) => h.name === "Subject")?.value || "(no subject)";
-          const body = extractTextFromPayload(message.payload);
+          const body = extractTextFromPayload(message.payload).slice(0, 1200);
 
-          allEmailContent += `\n---\nFrom: ${from}\nDate: ${date}\nSubject: ${subject}\nBody: ${body.slice(0, 500)}\n`;
+          if (!body.trim()) continue;
+
+          allEmailContent += [
+            "--- EMAIL START ---",
+            `From: ${from}`,
+            `To: ${to}`,
+            `Date: ${date}`,
+            `Subject: ${subject}`,
+            `Body: ${body}`,
+            "--- EMAIL END ---",
+            "",
+          ].join("\n");
         }
-      } catch {
-        // Skip threads that can't be fetched
+      } catch (threadError) {
+        console.error(`Failed to fetch thread ${threadId}:`, threadError);
         continue;
       }
     }
 
-    if (!allEmailContent) {
+    if (!allEmailContent.trim()) {
       return NextResponse.json({
         sentiment: "neutral",
         score: 0.5,
-        summary: "No email content could be retrieved for analysis.",
+        summary: "No readable email content could be retrieved for analysis.",
         topics: [],
+        tone: "unknown",
       });
     }
 
-    // Analyze with Gemini
-    const prompt = `Analyze the sentiment of this email conversation with ${contactName} (${contactEmail}).
+    const prompt = `
+You are analyzing one email relationship.
 
-Email thread content:
-${allEmailContent.slice(0, 4000)}
+Contact:
+- Name: ${contactName || "Unknown"}
+- Email: ${contactEmail || "Unknown"}
 
-Respond with a JSON object (no markdown, just raw JSON) with these fields:
+Email conversation:
+${allEmailContent.slice(0, 12000)}
+
+Return ONLY raw valid JSON.
+Do not use markdown.
+Do not use code fences.
+Do not include explanation text.
+
+Use exactly this schema:
 {
   "sentiment": "positive" | "negative" | "neutral" | "mixed",
-  "score": <number from 0 (very negative) to 1 (very positive)>,
-  "summary": "<2-3 sentence summary of the relationship and conversation tone>",
-  "topics": ["<topic1>", "<topic2>", "<topic3>"],
-  "tone": "<one word describing the overall tone, e.g. professional, friendly, tense, enthusiastic>"
-}`;
+  "score": number,
+  "summary": string,
+  "topics": string[],
+  "tone": string
+}
+
+Rules:
+- "score" must be between 0 and 1
+- "summary" must be specific to this contact and these emails
+- "topics" should contain 2 to 5 short topics
+- "tone" should be a single short word or phrase
+`.trim();
 
     const geminiRes = await fetch(
       `https://generativelanguage.googleapis.com/v1beta/models/gemini-1.5-flash:generateContent?key=${process.env.GEMINI_API_KEY}`,
@@ -109,7 +175,10 @@ Respond with a JSON object (no markdown, just raw JSON) with these fields:
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({
           contents: [{ parts: [{ text: prompt }] }],
-          generationConfig: { maxOutputTokens: 1000, temperature: 0.2 },
+          generationConfig: {
+            maxOutputTokens: 700,
+            temperature: 0.2,
+          },
         }),
       }
     );
@@ -117,23 +186,58 @@ Respond with a JSON object (no markdown, just raw JSON) with these fields:
     const geminiData = await geminiRes.json();
     const text = geminiData?.candidates?.[0]?.content?.parts?.[0]?.text ?? "";
 
+    if (!geminiRes.ok) {
+      console.error("Gemini API error:", geminiData);
+      return NextResponse.json(
+        { error: "Gemini API request failed" },
+        { status: 500 }
+      );
+    }
+
     let result;
     try {
-      result = JSON.parse(text.replace(/```json\n?|\n?```/g, "").trim());
-    } catch {
+      result = safeJsonParse(text);
+    } catch (parseError) {
+      console.error("Failed to parse Gemini response:", text, parseError);
+
       result = {
         sentiment: "neutral",
         score: 0.5,
-        summary: "Could not analyze sentiment for this conversation.",
+        summary: "Could not reliably analyze this conversation.",
         topics: [],
         tone: "unknown",
       };
     }
 
+    const allowedSentiments = new Set(["positive", "negative", "neutral", "mixed"]);
+    if (!allowedSentiments.has(result.sentiment)) {
+      result.sentiment = "neutral";
+    }
+
+    if (typeof result.score !== "number" || Number.isNaN(result.score)) {
+      result.score = 0.5;
+    }
+
+    result.score = Math.max(0, Math.min(1, result.score));
+
+    if (!Array.isArray(result.topics)) {
+      result.topics = [];
+    }
+
+    if (typeof result.summary !== "string") {
+      result.summary = "No summary available.";
+    }
+
+    if (typeof result.tone !== "string") {
+      result.tone = "unknown";
+    }
+
     return NextResponse.json(result);
   } catch (error: unknown) {
     console.error("Sentiment analysis error:", error);
-    const message = error instanceof Error ? error.message : "Failed to analyze sentiment";
+    const message =
+      error instanceof Error ? error.message : "Failed to analyze sentiment";
+
     return NextResponse.json({ error: message }, { status: 500 });
   }
 }
