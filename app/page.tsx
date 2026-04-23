@@ -237,7 +237,7 @@ export default function Home() {
               marginBottom: "0.5rem",
             }}
           >
-            Conversation Pulse
+            Inbox Pulse
           </h1>
           <p style={{ color: "var(--text-dim)", fontSize: "1rem" }}>
             Sentiment analysis across your outreach — see who you've connected with and how those conversations feel.
