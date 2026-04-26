@@ -1,7 +1,7 @@
 "use client";
  
 import { SentimentBadge } from "./SentimentBadge"; 
-import { LoadingSpinner } from "./LoadingSpinner";
+import { LoadingSpinner } from "./LoadingSpinner"; 
 
 interface Contact {
   email: string;
