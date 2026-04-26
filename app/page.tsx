@@ -230,7 +230,7 @@ export default function Home() {
       <main style={{ maxWidth: 1100, margin: "0 auto", padding: "2.5rem 2rem" }}>
         <div style={{ marginBottom: "2.5rem" }}>
           <h1
-            style={{
+            style={{ 
               fontFamily: "'DM Serif Display', serif",
               fontSize: "2.5rem",
               letterSpacing: "-0.03em",
