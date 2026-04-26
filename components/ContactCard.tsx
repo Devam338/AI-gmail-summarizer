@@ -1,6 +1,6 @@
 "use client";
  
-import { SentimentBadge } from "./SentimentBadge";
+import { SentimentBadge } from "./SentimentBadge"; 
 import { LoadingSpinner } from "./LoadingSpinner";
 
 interface Contact {
