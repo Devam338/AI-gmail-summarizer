@@ -4,8 +4,8 @@ import { useSession, signIn, signOut } from "next-auth/react";
 import { useState, useEffect, useCallback } from "react";
 import { ContactCard } from "@/components/ContactCard";
 import { LoadingSpinner } from "@/components/LoadingSpinner";
- 
-interface Contact {
+
+interface Contact { 
   email: string;
   name: string;
   threadIds: string[];
