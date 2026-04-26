@@ -14,7 +14,7 @@ interface Contact {
 
 interface SentimentResult {
   sentiment: "positive" | "negative" | "neutral" | "mixed";
-  score: number;
+  score: number; 
   summary: string;
   topics: string[]; 
   tone: string; 
