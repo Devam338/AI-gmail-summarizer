@@ -19,7 +19,7 @@ interface SentimentResult {
   score: number;
   summary: string;
   topics: string[];
-  tone: string;
+  tone: string; 
 }
 
 type SentimentMap = Record<string, SentimentResult | "loading">;
