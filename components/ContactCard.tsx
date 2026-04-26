@@ -17,7 +17,7 @@ interface SentimentResult {
   score: number;
   summary: string;
   topics: string[]; 
-  tone: string;
+  tone: string; 
 }
 
 interface Props {
