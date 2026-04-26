@@ -37,7 +37,7 @@ const sentimentGlows = {
   positive: "rgba(34,211,165,0.06)",
   negative: "rgba(244,81,90,0.06)",
   neutral: "rgba(160,160,192,0.06)",
-  mixed: "rgba(244,162,81,0.06)",
+  mixed: "rgba(244,162,81,0.06)", 
 };
 
 function ScoreBar({ score }: { score: number }) {
