@@ -108,7 +108,7 @@ const avatarColors = [
   ["#22d3a5", "#0e6b54"],
   ["#f4a251", "#7a5028"],
   ["#f4515a", "#7a282c"], 
-  ["#51a4f4", "#28527a"],
+  ["#51a4f4", "#28527a"], 
 ];
 
 function getAvatarColor(email: string) {
