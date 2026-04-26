@@ -23,7 +23,7 @@ interface SentimentResult {
 interface Props {
   contact: Contact;
   sentiment: SentimentResult | "loading" | undefined;
-  onAnalyze: () => void;
+  onAnalyze: () => void; 
 }
 
 const sentimentColors = {
