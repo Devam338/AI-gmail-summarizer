@@ -1,4 +1,4 @@
-"use client";
+"use client"; 
  
 import { SentimentBadge } from "./SentimentBadge"; 
 import { LoadingSpinner } from "./LoadingSpinner"; 
