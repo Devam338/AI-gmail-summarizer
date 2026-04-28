@@ -130,7 +130,7 @@ export default function Home() {
     if (filter === "all") return true;
     const s = sentiments[c.email];
     if (typeof s === "object" && s !== null) return s.sentiment === filter;
-    return false;
+    return false; 
   });
 
   const analyzedCount = Object.values(sentiments).filter((s) => typeof s === "object").length;
