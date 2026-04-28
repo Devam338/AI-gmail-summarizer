@@ -1,6 +1,6 @@
 # Inboxpulse — Gmail Sentiment Analyzer
 
-A Next.js app that scans your Gmail sent folder, identifies contacts you've reached out to, and uses Claude AI to analyze the sentiment of each conversation.
+A Next.js app that scans your Gmail sent folder, identifies contacts you've reached out to, and uses Google Gemini to analyze the sentiment of each conversation.
 
 ---
 
