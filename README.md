@@ -78,52 +78,6 @@ Visit [http://localhost:3000](http://localhost:3000)
 
 ---
 
-## Deploying to Vercel
-
-### Option A — Vercel CLI (recommended)
-
-```bash
-npm install -g vercel
-vercel login
-vercel
-```
-
-Follow the prompts, then set environment variables:
-
-```bash
-vercel env add GOOGLE_CLIENT_ID
-vercel env add GOOGLE_CLIENT_SECRET
-vercel env add NEXTAUTH_SECRET
-vercel env add NEXTAUTH_URL        # set to https://your-app.vercel.app
-vercel env add GEMINI_API_KEY
-```
-
-Deploy to production:
-
-```bash
-vercel --prod
-```
-
-### Option B — Vercel Dashboard
-
-1. Push your code to GitHub
-2. Go to [vercel.com](https://vercel.com) → **New Project**
-3. Import your GitHub repo
-4. Under **Environment Variables**, add all five variables from `.env.example`
-5. Click **Deploy**
-
-### After deploying
-
-1. Copy your Vercel deployment URL (e.g. `https://gmail-sentiment-xyz.vercel.app`)
-2. Update `NEXTAUTH_URL` in Vercel env vars to match
-3. In Google Cloud Console → Credentials → your OAuth client, add the redirect URI:
-   ```
-   https://your-app.vercel.app/api/auth/callback/google
-   ```
-4. Redeploy if you changed env vars: `vercel --prod`
-
----
-
 ## How It Works
 
 ```
