@@ -10,7 +10,7 @@ interface Contact {
   name: string;
   threadIds: string[];
   messageCount: number;
-  lastContact: string;
+  lastContact: string; 
   snippet: string;
 } 
  
