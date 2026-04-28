@@ -23,7 +23,7 @@ interface SentimentResult {
 }
 
 type SentimentMap = Record<string, SentimentResult | "loading">;
-
+ 
 export default function Home() {
   const { data: session, status } = useSession();
   const [contacts, setContacts] = useState<Contact[]>([]);
