@@ -7,7 +7,7 @@ import { LoadingSpinner } from "@/components/LoadingSpinner";
 
 interface Contact { 
   email: string;
-  name: string;
+  name: string; 
   threadIds: string[];
   messageCount: number;
   lastContact: string; 
