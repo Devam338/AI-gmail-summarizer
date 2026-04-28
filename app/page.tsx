@@ -18,7 +18,7 @@ interface SentimentResult {
   sentiment: "positive" | "negative" | "neutral" | "mixed";
   score: number;
   summary: string;
-  topics: string[];
+  topics: string[]; 
   tone: string; 
 }
 
