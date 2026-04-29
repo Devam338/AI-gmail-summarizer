@@ -9,7 +9,7 @@ interface Contact {
   threadIds: string[];
   messageCount: number;
   lastContact: string; 
-  snippet: string;
+  snippet: string; 
 } 
 
 interface SentimentResult {
