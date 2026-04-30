@@ -14,7 +14,7 @@ export interface Contact {
 
 function extractEmail(header: string): string {
   const match = header.match(/<([^>]+)>/);
-  return match ? match[1].toLowerCase() : header.toLowerCase().trim();
+  return match ? match[1].toLowerCase() : header.toLowerCase().trim(); 
 }
 
 function extractName(header: string): string {
