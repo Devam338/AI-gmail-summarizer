@@ -28,7 +28,7 @@ interface Props {
  
 const sentimentColors = {
   positive: "var(--positive)", 
-  negative: "var(--negative)",
+  negative: "var(--negative)", 
   neutral: "var(--neutral)",
   mixed: "var(--mixed)",
 };
