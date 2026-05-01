@@ -25,7 +25,7 @@ interface Props {
   sentiment: SentimentResult | "loading" | undefined;
   onAnalyze: () => void; 
 }
-
+ 
 const sentimentColors = {
   positive: "var(--positive)", 
   negative: "var(--negative)",
