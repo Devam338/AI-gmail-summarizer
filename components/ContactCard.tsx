@@ -7,7 +7,7 @@ interface Contact {
   email: string;
   name: string;
   threadIds: string[];
-  messageCount: number;
+  messageCount: number; 
   lastContact: string; 
   snippet: string; 
 } 
