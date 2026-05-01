@@ -42,7 +42,7 @@ const sentimentGlows = {
 
 function ScoreBar({ score }: { score: number }) {
   const clampedScore = Math.max(0, Math.min(1, score));
-  const color =
+  const color = 
     clampedScore > 0.65
       ? "var(--positive)"
       : clampedScore < 0.4
