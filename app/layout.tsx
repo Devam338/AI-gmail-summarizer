@@ -1,7 +1,7 @@
 import type { Metadata } from "next";
 import "./globals.css";
 import { Providers } from "./providers";
-
+ 
 export const metadata: Metadata = {
   title: "Inboxpulse — Gmail Sentiment Analyzer", 
   description: "Understand the emotional tone of your Gmail conversations at a glance.",
