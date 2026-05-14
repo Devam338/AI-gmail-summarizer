@@ -10,7 +10,7 @@ A Next.js app that scans your Gmail sent folder, identifies contacts you've reac
 - **NextAuth.js** — Google OAuth + session management 
 - **Gmail API** (via `googleapis`) — read sent emails 
 - **Google Gemini API** (free tier) — sentiment analysis
-- **Tailwind CSS** — styling
+- **Tailwind CSS** — styling 
 - **Vercel** — deployment 
 
 ---
