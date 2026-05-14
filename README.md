@@ -6,7 +6,7 @@ A Next.js app that scans your Gmail sent folder, identifies contacts you've reac
 
 ## Tech Stack
 
-- **Next.js 14** (App Router) — framework
+- **Next.js 14** (App Router) — framework 
 - **NextAuth.js** — Google OAuth + session management
 - **Gmail API** (via `googleapis`) — read sent emails
 - **Google Gemini API** (free tier) — sentiment analysis
