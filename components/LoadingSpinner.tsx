@@ -11,7 +11,7 @@ export function LoadingSpinner({ size = 32 }: { size?: number }) {
     >
       <svg
         width={size} 
-        height={size}
+        height={size} 
         viewBox="0 0 32 32"
         fill="none"
         style={{ animation: "spin 1s linear infinite" }}
