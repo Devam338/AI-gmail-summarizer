@@ -10,7 +10,7 @@ export function LoadingSpinner({ size = 32 }: { size?: number }) {
       }}
     >
       <svg
-        width={size}
+        width={size} 
         height={size}
         viewBox="0 0 32 32"
         fill="none"
